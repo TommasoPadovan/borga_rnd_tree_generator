@@ -3,16 +3,19 @@ from tree import Tree
 # edit this to change the number of nodes
 NODE_NUMBER = 1000
 
-tree = Tree()
+# edit this to change the number of tries of your experiment
+TRIES = 10
 
-for i in range(1, NODE_NUMBER):
-    tree.rnd_add()
+trees = [None] * TRIES
 
+for t in range(0, TRIES):
+    print ("starting try #%s..." % t)
+    trees[t] = Tree()
+    for i in range(1, NODE_NUMBER):
+        trees[t].rnd_add()
 
-tree.in_order_visit()
+    trees[t].in_order_visit()
 
-tree.post_order_visit()
+    trees[t].post_order_visit()
 
-tree.printTree()
-
-tree.output_csv()
+Tree.output_csv_multiple(trees)

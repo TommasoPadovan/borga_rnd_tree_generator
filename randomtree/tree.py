@@ -10,13 +10,13 @@ class Node:
 
 
 class Tree:
-    inCount = 1
-    postCount = 1
 
     def __init__(self):
         self.root = Node()
-        self.frontier = [self.root]
+        self.frontier = [self.root, self.root]
         self.nodeCount = 1
+        self.inCount = 1
+        self.postCount = 1
 
     def getRoot(self):
         return self.root
@@ -37,43 +37,42 @@ class Tree:
         possibleChildren.remove(which)
 
         # if it was the last child free -> the father node is "complete" (has 2 children) -> remove if from frontier
-        if not possibleChildren:
-            self.frontier.remove(candidate)
+        self.frontier.remove(candidate)
 
         # add the node -> the new node is obviously a leaf -> so it is in the frontier
         if which == "l":
             candidate.l = Node()
             self.frontier.append(candidate.l)
+            self.frontier.append(candidate.l)
         elif which == "r":
             candidate.r = Node()
+            self.frontier.append(candidate.r)
             self.frontier.append(candidate.r)
 
         # update the node count
         self.nodeCount += 1
 
     def in_order_visit(self):
-        Tree.visit_in(self.root)
+        self.visit_in(self.root)
 
-    @staticmethod
-    def visit_in(node):
+    def visit_in(self, node):
         if node is None:
             return
-        Tree.visit_in(node.l)
-        node.inOrderTag = Tree.inCount
-        Tree.inCount += 1
-        Tree.visit_in(node.r)
+        self.visit_in(node.l)
+        node.inOrderTag = self.inCount
+        self.inCount += 1
+        self.visit_in(node.r)
 
     def post_order_visit(self):
-        Tree.visit_post(self.root)
+        self.visit_post(self.root)
 
-    @staticmethod
-    def visit_post(node):
+    def visit_post(self, node):
         if node is None:
             return
-        Tree.visit_post(node.l)
-        Tree.visit_post(node.r)
-        node.postOrderTag = Tree.postCount
-        Tree.postCount += 1
+        self.visit_post(node.l)
+        self.visit_post(node.r)
+        node.postOrderTag = self.postCount
+        self.postCount += 1
 
     def deleteTree(self):
         # garbage collector will do this for us.
@@ -102,6 +101,33 @@ class Tree:
             f.write("%s, %s\n" % (node.inOrderTag, node.postOrderTag))
             self._output_csv(node.r, f)
 
+    @staticmethod
+    def output_csv_multiple(trees):
+        f = open("culo.csv", "w+")
+        i = 0
+        for tree in trees:
+            root = tree.getRoot()
+            i += 1
+            f.write("in %s, " % i)
+            Tree._output_csv_line_in(root, f)
+            f.write("\n")
+            f.write("out %s, " % i)
+            Tree._output_csv_line_post(root, f)
+            f.write("\n,\n")
+
+    @staticmethod
+    def _output_csv_line_in(node, f):
+        if node is not None:
+            Tree._output_csv_line_in(node.l, f)
+            f.write("%s, " % node.inOrderTag)
+            Tree._output_csv_line_in(node.r, f)
+
+    @staticmethod
+    def _output_csv_line_post(node, f):
+        if node is not None:
+            Tree._output_csv_line_post(node.l, f)
+            f.write("%s, " % node.postOrderTag)
+            Tree._output_csv_line_post(node.r, f)
 
 #     3
 # 0     4

@@ -86,9 +86,21 @@ class Tree:
     def _printTree(self, node):
         if node is not None:
             self._printTree(node.l)
-            print ("(%s, %s), " % (node.inOrderTag, node.postOrderTag))
+            print ("(%s, %s)" % (node.inOrderTag, node.postOrderTag))
             self._printTree(node.r)
 
+    def output_csv(self):
+        if self.root is not None:
+            f = open("culo.csv", "w+")
+            f.write("in_oder, post_order\n")
+            self._output_csv(self.root, f)
+            f.close()
+
+    def _output_csv(self, node, f):
+        if node is not None:
+            self._output_csv(node.l, f)
+            f.write("%s, %s\n" % (node.inOrderTag, node.postOrderTag))
+            self._output_csv(node.r, f)
 
 
 #     3

@@ -14,3 +14,5 @@ tree.in_order_visit()
 tree.post_order_visit()
 
 tree.printTree()
+
+tree.output_csv()

@@ -30,3 +30,5 @@ tree.in_order_visit()
 tree.post_order_visit()
 
 print(tree.printTree())
+
+tree.output_csv()

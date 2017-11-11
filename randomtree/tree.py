@@ -1,8 +1,10 @@
 from random import choice
+import sys
 
 
 class Node:
-    def __init__(self):
+    def __init__(self, father):
+        self.father = father
         self.l = None
         self.r = None
         self.inOrderTag = None
@@ -12,45 +14,50 @@ class Node:
 class Tree:
 
     def __init__(self):
-        self.root = Node()
-        self.frontier = [self.root, self.root]
-        self.nodeCount = 1
+        self.root = Node(None)
         self.inCount = 1
         self.postCount = 1
 
     def getRoot(self):
         return self.root
 
-    def rnd_add(self):
-        # choose a random node in the frontier
-        candidate = choice(self.frontier)
+    def generate_from_pattern(self, pattern):
+        Tree.de_tree(self.root, pattern)
 
-        # check which of his "child-slots" is free
-        possibleChildren = []
-        if candidate.l is None:
-            possibleChildren.append("l")
-        if candidate.r is None:
-            possibleChildren.append("r")
+    @staticmethod
+    def de_tree(node, ptn):
+        if node is None:
+            sys.exit("Invalid pattern, fuck you (none node)")
+        if not ptn:
+            return
+        else:
+            print(''.join(ptn))
+            if ptn[0] == "(":
+                if node.l is None:
+                    node.l = Node(node)
+                    return Tree.de_tree(node.l, ptn[1:])
+                if node.r is None:
+                    node.r = Node(node)
+                    return Tree.de_tree(node.r, ptn[1:])
+                return Tree.de_tree(node.father, ptn)
 
-        # choose one among the possible children
-        which = choice(possibleChildren)
-        possibleChildren.remove(which)
-
-        # if it was the last child free -> the father node is "complete" (has 2 children) -> remove if from frontier
-        self.frontier.remove(candidate)
-
-        # add the node -> the new node is obviously a leaf -> so it is in the frontier
-        if which == "l":
-            candidate.l = Node()
-            self.frontier.append(candidate.l)
-            self.frontier.append(candidate.l)
-        elif which == "r":
-            candidate.r = Node()
-            self.frontier.append(candidate.r)
-            self.frontier.append(candidate.r)
-
-        # update the node count
-        self.nodeCount += 1
+            elif ptn[0] == ")":
+                if node.l is None:
+                    if not ptn[1:]:
+                        return
+                    else:
+                        if ptn[1] == ")":
+                            if node.r is None:
+                                return Tree.de_tree(node.father, ptn[2:])
+                            else:
+                                return Tree.de_tree(node.father, ptn[2:])
+                        elif ptn[1] == "(":
+                            node.r = Node(node)
+                            return Tree.de_tree(node.r, ptn[2:])
+                else:
+                    if node.r is None:
+                        return Tree.de_tree(node.father, ptn[1:])
+                    sys.exit("Invalid pattern, fuck you --- too few ')'")
 
     def in_order_visit(self):
         self.visit_in(self.root)
@@ -80,13 +87,12 @@ class Tree:
 
     def printTree(self):
         if self.root is not None:
-            self._printTree(self.root)
+            return self._printTree(self.root, 1)
 
-    def _printTree(self, node):
+    def _printTree(self, node, depth):
         if node is not None:
-            self._printTree(node.l)
-            print ("(%s, %s)" % (node.inOrderTag, node.postOrderTag))
-            self._printTree(node.r)
+            return "(X \n%sl -> %s\n%sr -> %s)" % ("\t"*depth, self._printTree(node.l, depth+1), "\t"*depth, self._printTree(node.r, depth+1))
+        return "none"
 
     def output_csv(self):
         if self.root is not None:

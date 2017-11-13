@@ -1,4 +1,3 @@
-from random import choice
 import sys
 
 
@@ -21,8 +20,17 @@ class Tree:
     def getRoot(self):
         return self.root
 
+    # def generate_from_pattern_iterative(self, pattern):
+    #     child = "l"
+    #     current = self.root
+    #     for p in pattern:
+    #         if p == "(":
+    #         if child == "l":
+    #             current.l = Node(current)
+    #             current = current.l
+
     def generate_from_pattern(self, pattern):
-        self.de_tree(self.root, "l", pattern)
+        self.de_tree(self.root, "l", pattern[1:])
 
     def de_tree(self, node, child, ptn):
         if not ptn:
@@ -100,6 +108,17 @@ class Tree:
             self._output_csv(node.l, f)
             f.write("%s, %s\n" % (node.inOrderTag, node.postOrderTag))
             self._output_csv(node.r, f)
+
+    def get_post_order_indexed_by_in_oder_tag(self):
+        post_order_list = []
+        self._get_post_order_indexed_by_in_oder_tag(self.root, post_order_list)
+        return post_order_list
+
+    def _get_post_order_indexed_by_in_oder_tag(self, node, lst):
+        if node is not None:
+            self._get_post_order_indexed_by_in_oder_tag(node.l, lst)
+            lst.append(node.postOrderTag)
+            self._get_post_order_indexed_by_in_oder_tag(node.r, lst)
 
     @staticmethod
     def output_csv_multiple(trees):

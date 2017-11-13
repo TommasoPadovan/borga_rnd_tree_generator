@@ -22,42 +22,36 @@ class Tree:
         return self.root
 
     def generate_from_pattern(self, pattern):
-        Tree.de_tree(self.root, pattern)
+        self.de_tree(self.root, "l", pattern)
 
-    @staticmethod
-    def de_tree(node, ptn):
-        if node is None:
-            sys.exit("Invalid pattern, fuck you (none node)")
+    def de_tree(self, node, child, ptn):
         if not ptn:
             return
+        print("%s|%s" % (ptn[0], ''.join(ptn[1:])))
+        if ptn[0] == "(":
+            if child == "l":
+                node.l = Node(node)
+                return self.de_tree(node.l, "l", ptn[1:])
+            else:
+                node.r = Node(node)
+                return self.de_tree(node.r, "l", ptn[1:])
         else:
-            print(''.join(ptn))
-            if ptn[0] == "(":
-                if node.l is None:
-                    node.l = Node(node)
-                    return Tree.de_tree(node.l, ptn[1:])
-                if node.r is None:
-                    node.r = Node(node)
-                    return Tree.de_tree(node.r, ptn[1:])
-                return Tree.de_tree(node.father, ptn)
+            next_one = (self.next_candidate(node, child))
+            return self.de_tree(next_one[0], next_one[1], ptn[1:])
 
-            elif ptn[0] == ")":
-                if node.l is None:
-                    if not ptn[1:]:
-                        return
-                    else:
-                        if ptn[1] == ")":
-                            if node.r is None:
-                                return Tree.de_tree(node.father, ptn[2:])
-                            else:
-                                return Tree.de_tree(node.father, ptn[2:])
-                        elif ptn[1] == "(":
-                            node.r = Node(node)
-                            return Tree.de_tree(node.r, ptn[2:])
-                else:
-                    if node.r is None:
-                        return Tree.de_tree(node.father, ptn[1:])
-                    sys.exit("Invalid pattern, fuck you --- too few ')'")
+    def next_candidate(self, node, child):
+        if child == "l":
+            if node.r is None:
+                return node, "r"
+            sys.exit("we should be here")
+        node = node.father
+        if node is None:
+            sys.exit("too many ')")
+        while node.r is not None:
+            if node is None:
+                sys.exit("too many ')'")
+            node = node.father
+        return node, "r"
 
     def in_order_visit(self):
         self.visit_in(self.root)
